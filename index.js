@@ -4,7 +4,7 @@ const { default: axios } = require('axios');
 const { JSDOM } = jsdom;
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 4000;;
 
 // Función para convertir HTML a texto sin entidades
 const convertHtmlToText = (html) => {
