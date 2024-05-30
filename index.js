@@ -26,12 +26,12 @@ const convertHtmlToText = (html) => {
     html = html.replace(new RegExp('&' + entities[i][0] + ';', 'g'), entities[i][1]);
   }
   
-  return html.replace(/\s+/g, ' ').trim(); // Eliminar espacios redundantes y recortar
+  return html.replace(/\s+/g, '  ').trim(); // Eliminar espacios redundantes y recortar
 }
 
 // Función para eliminar elementos no deseados
 const removeUnwantedElements = (document) => {
-  const selectors = ['img', 'button', 'script', 'style', 'iframe', 'noscript', 'header', 'footer', 'nav', 'aside', '.advertisement', '.ad', '.ads'];
+  const selectors = ['img', 'br','button', 'script', 'style', 'iframe', 'noscript', 'header', 'footer', 'nav', 'aside', '.advertisement', '.ad', '.ads'];
   selectors.forEach(selector => {
     const elements = document.querySelectorAll(selector);
     elements.forEach(element => element.remove());
@@ -47,6 +47,8 @@ const extractMainContent = (document) => {
       return element.textContent || element.innerText;
     }
   }
+
+
   return document.body.textContent || document.body.innerText;
 }
 
