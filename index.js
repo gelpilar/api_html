@@ -12,7 +12,7 @@ const cleanAndExtractArticle = (html) => {
   const doc = new JSDOM(html).window.document;
   const reader = new Readability(doc);
   const article = reader.parse();
-  return article ? article.content : '';
+  return article ? article.textContent.trim() : '';
 }
 
 // Función para eliminar elementos no deseados
