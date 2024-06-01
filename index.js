@@ -1,55 +1,27 @@
 const express = require('express');
 const jsdom = require("jsdom");
 const { default: axios } = require('axios');
+const { Readability } = require('@mozilla/readability');
 const { JSDOM } = jsdom;
 
 const app = express();
-const PORT = process.env.PORT || 4000;;
+const PORT = process.env.PORT || 4000;
 
-// Función para convertir HTML a texto sin entidades
-const convertHtmlToText = (html) => {
-  var entities = [
-    ['amp', '&'],
-    ['apos', '\''],
-    ['#x27', '\''],
-    ['#x2F', '/'],
-    ['#39', '\''],
-    ['#47', '/'],
-    ['lt', '<'],
-    ['gt', '>'],
-    ['nbsp', ' '],
-    ['quot', '"']
-  ];
-
-  // Reemplazar entidades HTML
-  for (var i = 0, max = entities.length; i < max; ++i) {
-    html = html.replace(new RegExp('&' + entities[i][0] + ';', 'g'), entities[i][1]);
-  }
-  
-  return html.replace(/\s+/g, '  ').trim(); // Eliminar espacios redundantes y recortar
+// Función para limpiar y extraer el contenido del artículo
+const cleanAndExtractArticle = (html) => {
+  const doc = new JSDOM(html).window.document;
+  const reader = new Readability(doc);
+  const article = reader.parse();
+  return article ? article.content : '';
 }
 
 // Función para eliminar elementos no deseados
 const removeUnwantedElements = (document) => {
-  const selectors = ['img', 'br','button', 'script', 'style', 'iframe', 'noscript', 'header', 'footer', 'nav', 'aside', '.advertisement', '.ad', '.ads'];
+  const selectors = ['img'];
   selectors.forEach(selector => {
     const elements = document.querySelectorAll(selector);
     elements.forEach(element => element.remove());
   });
-}
-
-// Función para extraer el texto del contenido principal
-const extractMainContent = (document) => {
-  const selectors = [ 'main', 'section', 'div'];
-  for (let selector of selectors) {
-    const element = document.querySelector(selector);
-    if (element) {
-      return element.textContent || element.innerText;
-    }
-  }
-
-
-  return document.body.textContent || document.body.innerText;
 }
 
 // Ruta para obtener y limpiar el HTML de una URL
@@ -66,15 +38,12 @@ app.get('/api/clean-html', async (req, res) => {
     // Parsear el HTML usando JSDOM
     const dom = new JSDOM(html);
     const document = dom.window.document;
-    
+
     // Eliminar elementos no deseados
     removeUnwantedElements(document);
-    
-    // Extraer el contenido principal
-    let content = extractMainContent(document);
 
-    // Convertir el contenido a texto plano
-    const cleanedText = convertHtmlToText(content);
+    // Limpiar y extraer el contenido del artículo
+    const cleanedText = cleanAndExtractArticle(document.documentElement.innerHTML);
 
     res.send(cleanedText);
   } catch (error) {
