@@ -6,7 +6,17 @@ const { JSDOM } = jsdom;
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+const config = {
+  application: {
+      cors: {
+          server: [
+              {
+                  origin: "*", //servidor que deseas que consuma o (*) en caso que sea acceso libre
+                  credentials: true
+              }
+          ]
+      }
+}}
 // Función para limpiar y extraer el contenido del artículo
 const cleanAndExtractArticle = (html) => {
   const doc = new JSDOM(html).window.document;
