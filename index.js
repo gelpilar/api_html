@@ -3,7 +3,7 @@ const jsdom = require("jsdom");
 const { default: axios } = require('axios');
 const { Readability } = require('@mozilla/readability');
 const { JSDOM } = jsdom;
-
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -23,7 +23,9 @@ const removeUnwantedElements = (document) => {
     elements.forEach(element => element.remove());
   });
 }
-
+app.use(cors(
+  config.application.cors.server
+));
 // Ruta para obtener y limpiar el HTML de una URL
 app.get('/api/clean-html', async (req, res) => {
   try {
